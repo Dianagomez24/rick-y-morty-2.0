@@ -1,10 +1,21 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const App = () => {
   const [characters, setCharacters] = useState([]);
-  const [selectedCharacter, setSelectedCharacter] = useState(null); 
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
+
+  useEffect(() => {
+    const fetchCharacters = async () => {
+      try {
+        const response = await axios.get("https://rickandmortyapi.com/api/character?page=1");
+        setCharacters(response.data.results.slice(0, 10));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchCharacters();
+  }, []);
 
   useEffect(() => {
     const savedCharacter = localStorage.getItem("selectedCharacter");
@@ -13,26 +24,6 @@ const App = () => {
     }
   }, []);
 
-
-  useEffect(() => {
-    const savedCharacter = localStorage.getItem("selectedCharacter");
-    if (savedCharacter) {
-      setSelectedCharacter(JSON.parse(savedCharacter));
-    }
-  }, []);
-  
-  useEffect(() => {
-    axios
-      .get("https://rickandmortyapi.com/api/character?page=1")
-      .then((response) => {
-        const data = response.data.results.slice(0, 10); 
-        setCharacters(data); 
-      })
-      .catch((error) => console.error("Error fetching data: ", error));
-  }, []); 
-  
-  
-  
   const handleCharacterClick = (character) => {
     setSelectedCharacter(character);
     localStorage.setItem("selectedCharacter", JSON.stringify(character));
@@ -41,7 +32,6 @@ const App = () => {
   return (
     <div style={{ fontFamily: "Arial, sans-serif", padding: "20px", backgroundColor: "#fef5e7" }}>
       <h1>Rick & Morty Personajes</h1>
-
       {selectedCharacter && (
         <div
           style={{
@@ -62,7 +52,6 @@ const App = () => {
           <p>Especie: {selectedCharacter.species}</p>
         </div>
       )}
-
       <div
         style={{
           display: "grid",
